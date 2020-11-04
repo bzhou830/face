@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use("Agg")
 from keras.preprocessing.image import ImageDataGenerator
 from keras.optimizers import Adam
@@ -12,58 +13,60 @@ import numpy as np
 import argparse
 import random
 import cv2
-import os
-import glob
+import pandas as pd
 
 # handle command line arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-d", "--dataset", required=True,
-	help="path to input dataset (i.e., directory of images)")
+ap.add_argument("-d", "--dataset", type=str,
+                help="path to input dataset (i.e., directory of images)",
+                default="C:\\Users\\Bz\\Desktop\\ML\\dataset\\dataset\\celeba")
 ap.add_argument("-m", "--model", type=str, default="gender_detection.model",
-	help="path to output model")
+                help="path to output model")
 ap.add_argument("-p", "--plot", type=str, default="plot.png",
-	help="path to output accuracy/loss plot")
+                help="path to output accuracy/loss plot")
 args = ap.parse_args()
 
 # initial parameters
-epochs = 100
+epochs = 20
 lr = 1e-3
 batch_size = 64
-img_dims = (96,96,3)
+img_dims = (96, 96, 3)
 
 data = []
 labels = []
 
 # load image files from the dataset
-image_files = [f for f in glob.glob(args.dataset + "/**/*", recursive=True) if not os.path.isdir(f)] 
+# image_files = [f for f in glob.glob(args.dataset + "/**/*", recursive=True) if not os.path.isdir(f)]
+dataset_path = args.dataset
 random.seed(42)
-random.shuffle(image_files)
+# random.shuffle(image_files)
+
 
 # create groud-truth label from the image path
-for img in image_files:
-    # 读入图像
-    image = cv2.imread(img)
-    
-    # 使用opencv识别出人脸区域，然后进行裁剪
+df = pd.read_csv(dataset_path + "/labels.csv", sep='\t', usecols=[1, 2])
+for row in df.itertuples():
+    image_file_path = dataset_path + "/img/" + getattr(row, 'img_name')
+    label = int(getattr(row, 'gender'))
+    if label == -1:
+        label = 0
+    image = cv2.imread(image_file_path)
+    '''
+    # 使用 opencv 识别出人脸区域，然后进行裁剪
     faces_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     faces = faces_cascade.detectMultiScale(gray, 1.3, 5)
-    if len(face) != 1:
+    if len(faces) != 1:
+        print(image_file_path, "could not fount face")
         continue
     x, y, width, height = faces[0]
-        result.append((x,y,x+width,y+height))
-    face_region = image[y:y+height, x:x+width]
+    face_region = image[y:y + height, x:x + width]
+    '''
     # 调整图像大小为网络输入层的大小
-    image = cv2.resize(image, (img_dims[0],img_dims[1]))
+    image = cv2.resize(image, (img_dims[0], img_dims[1]))
     image = img_to_array(image)
     data.append(image)
-    # 获取该图对应的label
-    label = img.split(os.path.sep)[-2]
-    if label == "woman":
-        label = 1
-    else:
-        label = 0
     labels.append([label])
+
 
 # pre-processing
 data = np.array(data, dtype="float") / 255.0
@@ -75,6 +78,8 @@ labels = np.array(labels)
 trainY = to_categorical(trainY, num_classes=2)
 testY = to_categorical(testY, num_classes=2)
 
+print(trainY)
+print(testY)
 # augmenting datset 
 aug = ImageDataGenerator(rotation_range=25, width_shift_range=0.1,
                          height_shift_range=0.1, shear_range=0.2, zoom_range=0.2,
@@ -85,12 +90,12 @@ model = SmallerVGGNet.build(width=img_dims[0], height=img_dims[1], depth=img_dim
                             classes=2)
 
 # compile the model
-opt = Adam(lr=lr, decay=lr/epochs)
+opt = Adam(lr=lr, decay=lr / epochs)
 model.compile(loss="binary_crossentropy", optimizer=opt, metrics=["accuracy"])
 
 # train the model
 H = model.fit_generator(aug.flow(trainX, trainY, batch_size=batch_size),
-                        validation_data=(testX,testY),
+                        validation_data=(testX, testY),
                         steps_per_epoch=len(trainX) // batch_size,
                         epochs=epochs, verbose=1)
 
@@ -101,10 +106,10 @@ model.save(args.model)
 plt.style.use("ggplot")
 plt.figure()
 N = epochs
-plt.plot(np.arange(0,N), H.history["loss"], label="train_loss")
-plt.plot(np.arange(0,N), H.history["val_loss"], label="val_loss")
-plt.plot(np.arange(0,N), H.history["acc"], label="train_acc")
-plt.plot(np.arange(0,N), H.history["val_acc"], label="val_acc")
+plt.plot(np.arange(0, N), H.history["loss"], label="train_loss")
+plt.plot(np.arange(0, N), H.history["val_loss"], label="val_loss")
+plt.plot(np.arange(0, N), H.history["acc"], label="train_acc")
+plt.plot(np.arange(0, N), H.history["val_acc"], label="val_acc")
 
 plt.title("Training Loss and Accuracy")
 plt.xlabel("Epoch #")
@@ -113,3 +118,4 @@ plt.legend(loc="upper right")
 
 # save plot to disk
 plt.savefig(args.plot)
+
