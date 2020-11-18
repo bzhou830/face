@@ -42,8 +42,6 @@ df = pd.read_csv(dataset_path + "/labels.csv", sep='\t', usecols=[1, 2])
 for row in df.itertuples():
     image_file_path = dataset_path + "/img/" + getattr(row, 'img_name')
     label = int(getattr(row, 'gender'))
-    if label == -1:
-        label = 0
     image = cv2.imread(image_file_path)
     # 调整图像大小为网络输入层的大小
     image = cv2.resize(image, (img_dims[0], img_dims[1]))
