@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, jsonify, json
 from camera import VideoCamera
 import requests
 import random
@@ -10,9 +10,11 @@ app = Flask(__name__)
 def index():
     hum = random.randint(0, 100)
     tem = random.randint(-100,100)
+    gps = "30.111000, 150.0000"
     templateData = {
         'tem': tem,
-        'hum': hum
+        'hum': hum,
+        'gps': gps
     }
     return render_template('index.html', **templateData)
 

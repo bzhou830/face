@@ -8,21 +8,13 @@
     <link href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <script src="http://cdn.staticfile.org/jquery/2.2.4/jquery.min.js"></script>
     <style type="text/css">
-        #front {
-            margin-left: 55px;
-            margin-bottom: 3px;
-        }
-        #rear{
-            margin-top: 3px;
-            margin-left: 55px;
-        }
         .btn{
              background: #62559f;
         }
-        #container {
-            align-items: center;
-            position: absolute;
-            margin: auto;
+        span{
+            font-size: 20px;
+            color: BLUE;
+            font-weight: bold;
         }
     </style>
     <script>
@@ -39,17 +31,23 @@
   </head>
 
   <body>
-    <div class="t_b_box">
-        <span>溫度</span> <i></i>
-        <h2>{{ tem }}℃</h2>
-      </div>
-      <div class="t_b_box1">
-        <span>湿度</span> <i></i>
-        <h2>{{ hum }}RH</h2>
-      </div>
+    <div align="center" style="margin:0px auto;">
+        <div class="t_b_box">
+            <P> 温度: <span >{{ tem }} ℃</span></P>
+        </div>
+        <div class="t_b_box1">
+            <P> 湿度: <span>{{ hum }} RH</span></P>
+        </div>
+        <div class="t_b_box1">
+            <P> GPS: <span> {{ gps }} </span></P>
+        </div>
     </div>
-    <img id="bg" width="480" height="360" src="{{ url_for('video_feed') }}">
-    <div id="container">
+
+    <div align="center" style="margin:0px auto;">
+        <img id="bg" width="480" height="360" src="{{ url_for('video_feed') }}">
+    </div>
+    
+    <div id="container" align="center" style="margin:0px auto;">
         <div>
             <button id="front" class="btn btn-lg btn-primary glyphicon glyphicon-circle-arrow-up"></button>
         </div>
@@ -66,6 +64,15 @@
             <button id='rightRear' class="btn btn-lg btn-primary glyphicon">右后转</button>
         </div>
     </div>
+    <!-- <script language="JavaScript"> 
+        function myrefresh() 
+        {                
+            $.getJSON("get_data", function(result){
+			    alert("data");
+		    }); 
+        } 
+        setTimeout('myrefresh()', 1000);
+    </script>         -->
     <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>    
   </body>
 </html>
