@@ -39,7 +39,7 @@ class Car:
     # 电机引脚初始化为输出模式
     # 按键引脚初始化为输入模式
     # 超声波引脚初始化
-    def init_stat(self):
+    def __init__(self):
         global pwm_ENA1
         global pwm_ENB1
         global pwm_ENA2
@@ -167,25 +167,25 @@ class Car:
 
 class DHT:
     # GPIO口定义
-    def makerobo_setup(self):
+    def __init__(self):
         sensor = Adafruit_DHT.DHT11
 
-    # 循环函数
-    def loop(self):
-        humidity, temperature = Adafruit_DHT.read_retry(self.sensor, makerobo_pin)
+    def get_temp_hum():
         while True:
+            humidity, temperature = Adafruit_DHT.read_retry(self.sensor, makerobo_pin)
             if humidity is not None and temperature is not None:
                 print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+                break
             else:
                 print('Failed to get reading. Try again!')
-            time.sleep(1)  # 延时1s
+        return humidity, temperature
 
     def destroy(self):
         GPIO.cleanup()  # 释放资源
 
 
 class Gps:
-    def init_stat(self):
+    def __init__(self):
         x = L76X.L76X()
         x.L76X_Set_Baudrate(9600)
         x.L76X_Send_Command(x.SET_NMEA_BAUDRATE_115200)
@@ -202,15 +202,17 @@ class Gps:
             print('Already positioned')
         else:
             print('No positioning')
+            return ""
         print('Time %d:' % self.x.Time_H)
         print('%d:' % self.x.Time_M)
         print('%d' % self.x.Time_S)
         print('Lon = %f' % self.x.Lon)
-        print(' Lat = %f' % self.x.Lat)
+        print('Lat = %f' % self.x.Lat)
         self.x.L76X_Baidu_Coordinates(self.x.Lat,self.x.Lon)
         print('Baidu coordinate %f' % self.x.Lat_Baidu)
         print(',%f' % self.x.Lon_Baidu)
-
+        res = 'Time %d:%d:%d. \n Lon = %f, Lat = %f \n Baidu coordinate %f, %f.'.format(self.x.Time_H, self.x.Time_M, self.x.Time_S, self.x.Lon, self.x.Lat, self.x.Lat_Baidu, self.x.Lon_Baidu)
+        return res
 
 car = Car()
 dht = DHT()
@@ -218,12 +220,11 @@ gps = Gps()
 
 app = Flask(__name__)
 
-
 @app.route('/')
 def index():
-    hum = random.randint(0, 100)
-    tem = random.randint(-100, 100)
-    gps = "30.111000, 150.0000"
+    car.brake()
+    hum, tem = dht.get_temp_hum()
+    gps_data = gps.get_gps()
     templateData = {
         'tem': tem,
         'hum': hum,
@@ -249,6 +250,21 @@ def cmd():
     for key, val in c.items():
         cmd_key = key
         break
+
+    if cmd_key == "front":
+        car.run()
+    elif cmd_key == "leftFront":
+        car.left()
+    elif cmd_key == "stop":
+        car.brake()
+    elif cmd_key == "rightFront":
+        car.right()
+    elif cmd_key == "rear":
+        car.back()
+    elif cmd_key == "leftRear":
+        car.spin_left()
+    elif cmd_key == "rightRear":
+        car.spin_right()
 
     # we can pass it to moto.
     print(cmd_key)

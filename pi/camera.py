@@ -2,7 +2,7 @@ import cv2
 
 class VideoCamera(object):
     def __init__(self):
-        video_source = 'C:\\Users\\BineanZhou\\Desktop\\111.wmv'
+        video_source = 0
         self.video = cv2.VideoCapture(video_source)
 
     def __del__(self):
