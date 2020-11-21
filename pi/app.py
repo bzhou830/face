@@ -26,7 +26,8 @@ ENB2 = 26
 makerobo_ECHO = 13
 makerobo_TRIG = 16
 
-makerobo_pin = 17  # DHT11 温湿度传感器管脚定义
+# DHT11 温湿度传感器管脚定义
+makerobo_pin = 17
 
 # 设置GPIO口为BCM编码方式
 GPIO.setmode(GPIO.BCM)
@@ -70,7 +71,7 @@ class Car:
         pwm_ENB2.start(0)
 
     # 小车前进
-    def run(self, leftspeed, rightspeed):
+    def run(self, leftspeed=10, rightspeed=10):
         GPIO.output(IN1, GPIO.LOW)
         GPIO.output(IN2, GPIO.HIGH)
         GPIO.output(IN3, GPIO.LOW)
@@ -85,7 +86,7 @@ class Car:
         pwm_ENB2.ChangeDutyCycle(rightspeed)
 
     # 小车后退
-    def back(self, leftspeed, rightspeed):
+    def back(self, leftspeed=10, rightspeed=10):
         GPIO.output(IN1, GPIO.HIGH)
         GPIO.output(IN2, GPIO.LOW)
         GPIO.output(IN3, GPIO.HIGH)
@@ -100,7 +101,7 @@ class Car:
         pwm_ENB2.ChangeDutyCycle(rightspeed)
 
     # 小车左转
-    def left(self, leftspeed, rightspeed):
+    def left(self, leftspeed=65, rightspeed=65):
         GPIO.output(INA, GPIO.LOW)
         GPIO.output(INB, GPIO.HIGH)
         GPIO.output(INC, GPIO.LOW)
@@ -115,7 +116,7 @@ class Car:
         pwm_ENB2.ChangeDutyCycle(rightspeed)
 
     # 小车右转
-    def right(self, leftspeed, rightspeed):
+    def right(self, leftspeed=65, rightspeed=65):
         GPIO.output(INA, GPIO.HIGH)
         GPIO.output(INB, GPIO.LOW)
         GPIO.output(IN3, GPIO.LOW)
@@ -124,7 +125,7 @@ class Car:
         pwm_ENA2.ChangeDutyCycle(rightspeed)
 
     # 小车原地左转
-    def spin_left(self, leftspeed, rightspeed):
+    def spin_left(self, leftspeed=85, rightspeed=85):
         GPIO.output(INA, GPIO.HIGH)
         GPIO.output(INB, GPIO.LOW)
         GPIO.output(INC, GPIO.HIGH)
@@ -139,7 +140,7 @@ class Car:
         pwm_ENB2.ChangeDutyCycle(rightspeed)
 
     # 小车原地右转
-    def spin_right(self, leftspeed, rightspeed):
+    def spin_right(self, leftspeed=85, rightspeed=85):
         GPIO.output(INA, GPIO.LOW)
         GPIO.output(INB, GPIO.HIGH)
         GPIO.output(INC, GPIO.LOW)
@@ -170,7 +171,7 @@ class DHT:
     def __init__(self):
         sensor = Adafruit_DHT.DHT11
 
-    def get_temp_hum():
+    def get_temp_hum(self):
         while True:
             humidity, temperature = Adafruit_DHT.read_retry(self.sensor, makerobo_pin)
             if humidity is not None and temperature is not None:
@@ -213,6 +214,7 @@ class Gps:
         print(',%f' % self.x.Lon_Baidu)
         res = 'Time %d:%d:%d. \n Lon = %f, Lat = %f \n Baidu coordinate %f, %f.'.format(self.x.Time_H, self.x.Time_M, self.x.Time_S, self.x.Lon, self.x.Lat, self.x.Lat_Baidu, self.x.Lon_Baidu)
         return res
+
 
 car = Car()
 dht = DHT()
