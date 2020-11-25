@@ -41,7 +41,21 @@ class Car:
     # 按键引脚初始化为输入模式
     # 超声波引脚初始化
     def __init__(self):
-        reset_pins()
+        GPIO.setup(ENA1, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(IN1, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(IN2, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(ENB1, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(IN3, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(IN4, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(ENA2, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(INA, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(INB, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(ENB2, GPIO.OUT, initial=GPIO.HIGH)
+        GPIO.setup(INC, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(IND, GPIO.OUT, initial=GPIO.LOW)
+        # GPIO.setup(key,GPIO.IN)
+        GPIO.setup(makerobo_ECHO, GPIO.IN)
+        GPIO.setup(makerobo_TRIG, GPIO.OUT)
         # 设置pwm引脚和频率为2000hz
         self.pwm_ENA1 = GPIO.PWM(ENA1, 2000)
         self.pwm_ENB1 = GPIO.PWM(ENB1, 2000)
@@ -69,66 +83,79 @@ class Car:
         GPIO.setup(makerobo_ECHO, GPIO.IN)
         GPIO.setup(makerobo_TRIG, GPIO.OUT)
 
-    # 小车前进
-    def run(self, leftspeed=10, rightspeed=10):
+
+    def run(self, leftspeed=50, rightspeed=50):
+        '''
+        四个轮子均前转
+        '''        
+        GPIO.output(INA, GPIO.HIGH)
+        GPIO.output(INB, GPIO.LOW)
+        GPIO.output(INC, GPIO.HIGH)
+        GPIO.output(IND, GPIO.LOW)
+
         GPIO.output(IN1, GPIO.LOW)
         GPIO.output(IN2, GPIO.HIGH)
         GPIO.output(IN3, GPIO.LOW)
         GPIO.output(IN4, GPIO.HIGH)
+        
+        self.pwm_ENB1.ChangeDutyCycle(leftspeed)
+        self.pwm_ENA2.ChangeDutyCycle(rightspeed)
+        self.pwm_ENA1.ChangeDutyCycle(leftspeed)
+        self.pwm_ENB2.ChangeDutyCycle(rightspeed)
+
+    def back(self, leftspeed=50, rightspeed=50):
+        '''
+        四个轮子均后转
+        '''
+        GPIO.output(INA, GPIO.LOW)
+        GPIO.output(INB, GPIO.HIGH)
+        GPIO.output(INC, GPIO.LOW)
+        GPIO.output(IND, GPIO.HIGH)
+
+        GPIO.output(IN1, GPIO.HIGH)
+        GPIO.output(IN2, GPIO.LOW)
+        GPIO.output(IN3, GPIO.HIGH)
+        GPIO.output(IN4, GPIO.LOW)
+        
+        self.pwm_ENB1.ChangeDutyCycle(leftspeed)
+        self.pwm_ENA2.ChangeDutyCycle(rightspeed)
+        self.pwm_ENA1.ChangeDutyCycle(leftspeed)
+        self.pwm_ENB2.ChangeDutyCycle(rightspeed)
+    
+    
+    def left(self, leftspeed=50, rightspeed=50):
+        '''
+        左轮不动，右轮前转
+        '''
         GPIO.output(INA, GPIO.HIGH)
         GPIO.output(INB, GPIO.LOW)
         GPIO.output(INC, GPIO.HIGH)
         GPIO.output(IND, GPIO.LOW)
         self.pwm_ENB1.ChangeDutyCycle(leftspeed)
         self.pwm_ENA2.ChangeDutyCycle(rightspeed)
-        self.pwm_ENA1.ChangeDutyCycle(leftspeed)
-        self.pwm_ENB2.ChangeDutyCycle(rightspeed)
 
-    # 小车后退
-    def back(self, leftspeed=10, rightspeed=10):
-        GPIO.output(IN1, GPIO.HIGH)
-        GPIO.output(IN2, GPIO.LOW)
-        GPIO.output(IN3, GPIO.HIGH)
-        GPIO.output(IN4, GPIO.LOW)
-        GPIO.output(INA, GPIO.LOW)
-        GPIO.output(INB, GPIO.HIGH)
-        GPIO.output(INC, GPIO.LOW)
-        GPIO.output(IND, GPIO.HIGH)
-        self.pwm_ENB1.ChangeDutyCycle(leftspeed)
-        self.pwm_ENA2.ChangeDutyCycle(rightspeed)
-        self.pwm_ENA1.ChangeDutyCycle(leftspeed)
-        self.pwm_ENB2.ChangeDutyCycle(rightspeed)
 
-    # 小车左转
-    def left(self, leftspeed=65, rightspeed=65):
-        GPIO.output(INA, GPIO.LOW)
-        GPIO.output(INB, GPIO.HIGH)
-        GPIO.output(INC, GPIO.LOW)
-        GPIO.output(IND, GPIO.HIGH)
-        GPIO.output(IN1, GPIO.HIGH)
-        GPIO.output(IN2, GPIO.LOW)
-        GPIO.output(IN3, GPIO.HIGH)
-        GPIO.output(IN4, GPIO.LOW)
-        self.pwm_ENB1.ChangeDutyCycle(leftspeed)
-        self.pwm_ENA2.ChangeDutyCycle(rightspeed)
-        self.pwm_ENA1.ChangeDutyCycle(leftspeed)
-        self.pwm_ENB2.ChangeDutyCycle(rightspeed)
-
-    # 小车右转
-    def right(self, leftspeed=65, rightspeed=65):
-        GPIO.output(INA, GPIO.HIGH)
-        GPIO.output(INB, GPIO.LOW)
+    def right(self, leftspeed=50, rightspeed=50):
+        '''
+        右轮不动，左轮前转
+        '''
+        GPIO.output(IN1, GPIO.LOW)
+        GPIO.output(IN2, GPIO.HIGH)
         GPIO.output(IN3, GPIO.LOW)
-        GPIO.output(IN4, GPIO.LOW)
-        self.pwm_ENB1.ChangeDutyCycle(leftspeed)
-        self.pwm_ENA2.ChangeDutyCycle(rightspeed)
+        GPIO.output(IN4, GPIO.HIGH)
+        self.pwm_ENA1.ChangeDutyCycle(leftspeed)
+        self.pwm_ENB2.ChangeDutyCycle(rightspeed)
 
-    # 小车原地左转
+   
     def spin_left(self, leftspeed=85, rightspeed=85):
+        '''
+        右轮前转，左轮后转
+        '''
         GPIO.output(INA, GPIO.HIGH)
         GPIO.output(INB, GPIO.LOW)
         GPIO.output(INC, GPIO.HIGH)
         GPIO.output(IND, GPIO.LOW)
+        
         GPIO.output(IN1, GPIO.HIGH)
         GPIO.output(IN2, GPIO.LOW)
         GPIO.output(IN3, GPIO.HIGH)
@@ -140,6 +167,9 @@ class Car:
 
     # 小车原地右转
     def spin_right(self, leftspeed=85, rightspeed=85):
+        '''
+        左轮前转，右轮后转
+        '''
         GPIO.output(INA, GPIO.LOW)
         GPIO.output(INB, GPIO.HIGH)
         GPIO.output(INC, GPIO.LOW)
@@ -223,15 +253,15 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    car.brake()
-    hum, tem = dht.get_temp_hum()
-    gps_data = gps.get_gps()
+    #car.brake()
+    hum, tem = 10, 100  # dht.get_temp_hum()
+    gps_data = 1111111  # gps.get_gps()
     templateData = {
         'tem': tem,
         'hum': hum,
         'gps': gps
     }
-    return render_template('index.html', **templateData)
+    return render_template('index.html', tem = tem, hum = hum, gps = gps)
 
 
 def gen(camera):
@@ -251,7 +281,7 @@ def cmd():
     for key, val in c.items():
         cmd_key = key
         break
-
+    car.reset_pins()
     if cmd_key == "front":
         car.run()
     elif cmd_key == "leftFront":
