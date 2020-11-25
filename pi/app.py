@@ -2,14 +2,14 @@ from flask import Flask, render_template, Response, request, jsonify, json
 from camera import VideoCamera
 import requests
 import random
-from car import Car
-from dht11 import DHT
-from gps import Gps
+# from car import Car
+# from dht11 import DHT
+# from gps import Gps
 
 
-car = Car()
-dht = DHT()
-gps = Gps()
+# car = Car()
+# dht = DHT()
+# gps = Gps()
 
 app = Flask(__name__)
 
@@ -36,6 +36,17 @@ def gen(camera):
 def video_feed():
     return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
+@app.route('/get_data')
+def get_data():
+    hum, tem =  random.randint(0, 100),  random.randint(-20, 100)
+    gps_data =  str(30 + random.random()) + ", \n" + str(150 + random.random())  # gps.get_gps()
+    templateData = {
+        'tem': tem,
+        'hum': hum,
+        'gps': gps_data
+    }
+    return jsonify(templateData)
 
 @app.route('/cmd', methods=['POST'])
 def cmd():

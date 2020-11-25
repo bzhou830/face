@@ -33,13 +33,13 @@
   <body>
     <div align="center" style="margin:0px auto;">
         <div class="t_b_box">
-            <P> 温度: <span >{{ tem }} ℃</span></P>
+            <P> 温度: <span id="tem">{{ tem }} ℃</span></P>
         </div>
         <div class="t_b_box1">
-            <P> 湿度: <span>{{ hum }} RH</span></P>
+            <P> 湿度: <span id="hum">{{ hum }} RH</span></P>
         </div>
         <div class="t_b_box1">
-            <P> GPS: <span> {{ gpsdata }} </span></P>
+            <P> GPS: <span id="gpsdata"> {{ gpsdata }} </span></P>
         </div>
     </div>
 
@@ -64,15 +64,18 @@
             <button id='rightRear' class="btn btn-lg btn-primary glyphicon">原地右转</button>
         </div>
     </div>
-    <!-- <script language="JavaScript"> 
+    <script language="JavaScript"> 
         function myrefresh() 
         {                
-            $.getJSON("get_data", function(result){
-			    alert("data");
-		    }); 
+            $.getJSON("get_data", function(rev_data){
+                document.getElementById("hum").innerText = rev_data.hum
+                document.getElementById("tem").innerText = rev_data.tem
+                document.getElementById("gpsdata").innerText = rev_data.gps
+            }); 
+            setTimeout('myrefresh()', 5000);
         } 
-        setTimeout('myrefresh()', 1000);
-    </script>         -->
+        setTimeout('myrefresh()', 5000);
+    </script>        
     <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>    
   </body>
 </html>
