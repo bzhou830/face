@@ -16,8 +16,8 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     #car.brake()
-    hum, tem = 10, 100  # dht.get_temp_hum()
-    gps_data = "1111111"  # gps.get_gps()
+    hum, tem = "--.-", "--.-"  # dht.get_temp_hum()
+    gps_data = "----, ----"  # gps.get_gps()
     templateData = {
         'tem': tem,
         'hum': hum,
@@ -40,7 +40,10 @@ def video_feed():
 @app.route('/get_data')
 def get_data():
     hum, tem =  random.randint(0, 100),  random.randint(-20, 100)
-    gps_data =  str(30 + random.random()) + ", \n" + str(150 + random.random())  # gps.get_gps()
+    gps_data =  str(30 + random.random()) + ", \n" + str(150 + random.random())
+
+    # hum, tem = dht.get_temp_hum()
+    # gps_data = gps.get_gps()
     templateData = {
         'tem': tem,
         'hum': hum,
