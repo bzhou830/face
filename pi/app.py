@@ -2,14 +2,14 @@ from flask import Flask, render_template, Response, request, jsonify, json
 from camera import VideoCamera
 import requests
 import random
-# from car import Car
-# from dht11 import DHT
-# from gps import Gps
+from car import Car
+from dht11 import DHT
+from gps import Gps
 
 
-# car = Car()
-# dht = DHT()
-# gps = Gps()
+car = Car()
+dht = DHT()
+gps = Gps()
 
 app = Flask(__name__)
 
