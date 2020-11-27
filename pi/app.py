@@ -18,11 +18,6 @@ def index():
     #car.brake()
     hum, tem = "--.-", "--.-"  # dht.get_temp_hum()
     gps_data = "----, ----"  # gps.get_gps()
-    templateData = {
-        'tem': tem,
-        'hum': hum,
-        'gps': gps_data
-    }
     return render_template('index.html', tem = tem, hum = hum, gpsdata = gps_data)
 
 
@@ -39,11 +34,8 @@ def video_feed():
 
 @app.route('/get_data')
 def get_data():
-    hum, tem =  random.randint(0, 100),  random.randint(-20, 100)
-    gps_data =  str(30 + random.random()) + ", \n" + str(150 + random.random())
-
-    # hum, tem = dht.get_temp_hum()
-    # gps_data = gps.get_gps()
+    hum, tem = dht.get_temp_hum()
+    gps_data = gps.get_gps()
     templateData = {
         'tem': tem,
         'hum': hum,
